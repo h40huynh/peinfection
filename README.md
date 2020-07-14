@@ -1,5 +1,7 @@
 # PEINFECTION
 
+## Giới thiệu
+
 Chương trình chèn shellcode vào các file thực thi windows.
 Các kỹ thuật:
 
@@ -10,4 +12,32 @@ Các kỹ thuật:
 Chương trình sau khi chèn sẽ:
 
 - Thực thi chương trình bình thường khi chạy ở máy ảo, hoặc debug.
-- Hiện messagebox với nội dung: Infected by 17520444_17520293 sau đó chạy chương trình bình thường.
+- Môi trường máy thật thì hiện messagebox với nội dung: Infected by 17520444_17520293 sau đó chạy chương trình bình thường.
+
+## Môi trường
+
+```
+Python 3.6.5
+```
+
+Thư viện liên quan
+
+```
+- pefile
+- tkinter
+```
+
+## Sử dụng
+
+Clone project về
+
+```sh
+git clone https://github.com/h40huynh/peinfection.git
+```
+
+Chạy file app.py với python
+
+```
+cd peinfection
+py app.py
+```

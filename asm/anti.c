@@ -4,6 +4,7 @@ int DoNotShow()
 {
     // Messagebox will run when isvm return 0
     __asm__(
+        ""
         // Calling CPUID with eax = 1 and check 31st bit of ecx, vm is 1
         // Calling CPUID with eax = 0x40000000 and check ecx, edx
         "xor %eax, %eax;"
